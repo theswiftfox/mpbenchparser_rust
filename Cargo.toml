@@ -1,0 +1,6 @@
+[package]
+name = "combine_results"
+version = "0.1.0"
+authors = ["Patrick Gantner <patrick.gantner92@gmail.com>"]
+
+[dependencies]
