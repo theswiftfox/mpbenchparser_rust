@@ -1,10 +1,19 @@
 use std::fmt;
 
+#[derive(Clone, Copy)]
 pub struct BenchmarkConfig {
     pub threads: i32,
     pub outer_reps: i32,
     pub test_time: f32,
     pub delay: f32,
+}
+
+impl PartialEq for BenchmarkConfig {
+    fn eq(&self, other: &BenchmarkConfig) -> bool {
+        self.threads == other.threads && self.outer_reps == other.outer_reps
+        && self.test_time + 0.01 > other.test_time && self.test_time - 0.01 < other.test_time
+        && self.delay + 0.01 > other.delay && self.delay - 0.01 < other.delay
+    }
 }
 
 impl fmt::Display for BenchmarkConfig {
@@ -13,6 +22,7 @@ impl fmt::Display for BenchmarkConfig {
     }
 }
 
+#[derive(Clone)]
 pub struct Section {
     pub name: String,
     pub sample_size: i32,
@@ -35,6 +45,23 @@ impl fmt::Display for Section {
     }
 }
 
+fn combine_sections(this: &Section, other: &Section) -> Section {
+    Section {
+        name: this.clone().name,
+        sample_size: (this.sample_size + other.sample_size) / 2, // this should stay the same i think?
+        avg: (this.avg + other.avg) / 2.0,
+        min: (this.min + other.min) / 2.0,
+        max: (this.max + other.max) / 2.0,
+        sd: (this.sd + other.sd) / 2.0,
+        outliers: (this.outliers + other.outliers) / 2,
+        time: (this.time + other.time) / 2.0,
+        time_deriv: (this.time_deriv + other.time_deriv) / 2.0,
+        overhead: (this.overhead + other.overhead) / 2.0,
+        overhead_deriv: (this.overhead_deriv + other.overhead_deriv) / 2.0
+    }
+}
+
+#[derive(Clone)]
 pub struct Benchmark {
     pub config: BenchmarkConfig,
     pub sections: Vec<Section>
@@ -47,6 +74,29 @@ impl fmt::Display for Benchmark {
             secstr = secstr + "\r\n------------------------------\r\n" + &sec.to_string();
         }
         write!(f, "{}\r\n{}", self.config, secstr)
+    }
+}
+
+pub fn combine_benchmarks(this: &Benchmark, other: &Benchmark) -> Benchmark {
+    let mut combined = Vec::new();
+    if this.config == other.config {
+        for section in other.sections.iter() {
+            for sec in this.sections.iter() {
+                if section.name == sec.name {                        
+                    combined.push(combine_sections(section, sec));
+                    break;
+                }
+            }
+        }
+        return Benchmark {
+            config: this.config,
+            sections: combined
+        };
+    } else {
+        return Benchmark {
+            config: this.config,
+            sections: this.sections.clone()
+        }
     }
 }
 

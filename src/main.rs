@@ -18,10 +18,27 @@ fn main() {
     println!("{}", full_path.display());
     let files = get_files(&full_path).expect("error reading folder content");
 
+    let mut combined : Vec<benchmark::Benchmark> = Vec::new();
     for file in files {
         let content = read_file(&file);
-        let benchmark = benchmark::create_benchmark_from_data(&content).expect("unable to create benchmark from given data");
-        println!("{}\r\n+++++++++++++++++", benchmark);
+        let cur = benchmark::create_benchmark_from_data(&content).expect("unable to create benchmark from given data");
+        //println!("{}\r\n+++++++++++++++++", cur);
+        let mut config_found : bool = false;
+        for i in 0 .. combined.len() {
+            if combined[i].config == cur.config {
+                config_found = true;
+                let comb = benchmark::combine_benchmarks(&combined[i], &cur);
+                combined[i] = comb;
+            }
+        }
+        if !config_found {
+            combined.push(cur);
+        }
+        
+    }
+
+    for fin in combined {
+        println!("{}\r\n+++++++++++++++++++", fin)
     }
 }
 
