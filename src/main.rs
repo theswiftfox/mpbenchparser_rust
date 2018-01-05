@@ -20,8 +20,8 @@ fn main() {
 
     for file in files {
         let content = read_file(&file);
-        let benchmark = benchmark::create_benchmark_from_data(content).expect("unable to create benchmark from given data");
-        println!("Threads: {}\r\nReps: {}\r\nTime: {}\r\nDelay: {}", benchmark.config.threads, benchmark.config.outer_reps, benchmark.config.test_time, benchmark.config.delay);
+        let benchmark = benchmark::create_benchmark_from_data(&content).expect("unable to create benchmark from given data");
+        println!("{}\r\n+++++++++++++++++", benchmark);
     }
 }
 
