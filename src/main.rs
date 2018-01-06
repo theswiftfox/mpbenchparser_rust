@@ -9,40 +9,55 @@ use std::io::prelude::*;
 mod benchmark;
 
 fn main() {
-    let mut rel_path = String::new();
-    let mut full_path = env::current_dir().expect("unable to get current working dir");
+    let mut args = env::args();
+    args.next(); // skip default argument
+    let mut folders : Vec<String> = Vec::new();
+    let working_dir = env::current_dir().unwrap();
 
-    println!("Current working dir: {}\r\nEnter relative path to the folder you want to process (use unix style seperators):", full_path.display());
-    io::stdin().read_line(&mut rel_path).expect("Unable to read input");
-    full_path = combine_path(&full_path, rel_path);
-    println!("{}", full_path.display());
-    let files = get_files(&full_path).expect("error reading folder content");
-
-    let mut combined : Vec<benchmark::Benchmark> = Vec::new();
-    for file in files {
-        let content = read_file(&file);
-        let cur = benchmark::create_benchmark_from_data(&content).expect("unable to create benchmark from given data");
-        //println!("{}\r\n+++++++++++++++++", cur);
-        let mut config_found : bool = false;
-        for i in 0 .. combined.len() {
-            if combined[i].config == cur.config {
-                config_found = true;
-                let comb = benchmark::combine_benchmarks(&combined[i], &cur);
-                combined[i] = comb;
-            }
-        }
-        if !config_found {
-            combined.push(cur);
-        }
-        
+    while let Some(arg) = args.next() {
+        folders.push(arg);
     }
 
-    let mut i = 0;
-    for fin in combined {
-        let filename = format!("{}/combined_{}.res", full_path.display(), i);
-        let mut file = File::create(filename).unwrap();
-        write!(&file, "{}\r\n{}", benchmark::header_string(&fin), benchmark::formatted_sections_string(&fin)).expect("unable to write content to file");
-        i += 1;
+    if folders.len() == 0 {
+        let mut rel_path = String::new();
+        println!("Current working dir: {}\r\nEnter relative path to the folder you want to process (use unix style seperators)!\r\nIf you want to process multiple folders, seperate the paths with a \";\"", working_dir.display());
+        io::stdin().read_line(&mut rel_path).expect("Unable to read input");
+        for path in rel_path.split(";") {
+            folders.push(path.to_string());
+        }
+    }
+
+    for folder in folders {
+        let folder_path = combine_path(&working_dir, folder);
+        println!("Processing {} ...", folder_path.display());
+        let files = get_files(&folder_path).expect("error reading folder content");
+
+        let mut combined : Vec<benchmark::Benchmark> = Vec::new();
+        for file in files {
+            let content = read_file(&file);
+            let cur = benchmark::create_benchmark_from_data(&content).expect("unable to create benchmark from given data");
+            //println!("{}\r\n+++++++++++++++++", cur);
+            let mut config_found : bool = false;
+            for i in 0 .. combined.len() {
+                if combined[i].config == cur.config {
+                    config_found = true;
+                    let comb = benchmark::combine_benchmarks(&combined[i], &cur);
+                    combined[i] = comb;
+                }
+            }
+            if !config_found {
+                combined.push(cur);
+            }
+            
+        }
+
+        let mut i = 0;
+        for fin in combined {
+            let filename = format!("{}/combined_{}.res", folder_path.display(), i);
+            let mut file = File::create(filename).unwrap();
+            write!(&file, "{}\r\n{}", benchmark::header_string(&fin), benchmark::formatted_sections_string(&fin)).expect("unable to write content to file");
+            i += 1;
+        }
     }
 }
 
@@ -54,7 +69,7 @@ fn get_files(foldername: &Path) -> Result<Vec<PathBuf>, io::Error> {
             if try!(fs::metadata(entry.path())).is_dir() {
                 continue;
             }
-            println!("Found file: {}", entry.path().display());
+            // println!("Found file: {}", entry.path().display());
             result.push(entry.path());
         }
         return Ok(result);

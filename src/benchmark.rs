@@ -85,7 +85,10 @@ pub fn formatted_sections_string(benchmark: &Benchmark) -> String {
     let mut formatted = String::new();
     for section in benchmark.sections.clone() {
         formatted = format!("{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\r\n", 
-            formatted, section.name, section.sample_size, section.avg, section.min, section.max, section.sd, section.outliers, section.time, section.time_deriv, section.overhead, section.overhead_deriv);
+            formatted, section.name, section.sample_size, section.avg, section.min,
+            section.max, section.sd, section.outliers,
+            section.time, section.time_deriv,
+            section.overhead, section.overhead_deriv);
     }
     return formatted;
 }
