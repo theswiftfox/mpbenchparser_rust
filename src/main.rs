@@ -37,8 +37,12 @@ fn main() {
         
     }
 
+    let mut i = 0;
     for fin in combined {
-        println!("{}\r\n+++++++++++++++++++", fin)
+        let filename = format!("{}/combined_{}.res", full_path.display(), i);
+        let mut file = File::create(filename).unwrap();
+        write!(&file, "{}\r\n{}", benchmark::header_string(&fin), benchmark::formatted_sections_string(&fin)).expect("unable to write content to file");
+        i += 1;
     }
 }
 
