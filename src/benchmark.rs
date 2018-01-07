@@ -77,15 +77,16 @@ impl fmt::Display for Benchmark {
     }
 }
 
-pub fn header_string(benchmark: &Benchmark) -> String {
-    return benchmark.config.to_string();
+pub fn header_string(/*benchmark: &Benchmark*/) -> String {
+    return String::from("Name\tThreads\tReps\tTestTime\tDelay\tSamples\tAvg\tMin\tMax\tS.D\tOutliers\tTime\tTimeDeriv\tOverhead\tOverheadDeriv");
 }
 
 pub fn formatted_sections_string(benchmark: &Benchmark) -> String {
     let mut formatted = String::new();
     for section in benchmark.sections.clone() {
-        formatted = format!("{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\r\n", 
-            formatted, section.name, section.sample_size, section.avg, section.min,
+        formatted = format!("{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\r\n", 
+            formatted, section.name, benchmark.config.threads, benchmark.config.outer_reps, benchmark.config.test_time,
+            benchmark.config.delay, section.sample_size, section.avg, section.min,
             section.max, section.sd, section.outliers,
             section.time, section.time_deriv,
             section.overhead, section.overhead_deriv);

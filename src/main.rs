@@ -51,12 +51,16 @@ fn main() {
             
         }
 
-        let mut i = 0;
+        let mut first = true;
+        let filename = format!("{}/combined.res", folder_path.display());
+        let file = File::create(&filename).unwrap();;
         for fin in combined {
-            let filename = format!("{}/combined_{}.res", folder_path.display(), i);
-            let mut file = File::create(filename).unwrap();
-            write!(&file, "{}\r\n{}", benchmark::header_string(&fin), benchmark::formatted_sections_string(&fin)).expect("unable to write content to file");
-            i += 1;
+            if first {
+                write!(&file, "{}\r\n{}", benchmark::header_string(), benchmark::formatted_sections_string(&fin)).expect("unable to write content to file");
+                first = false;
+            } else {
+                write!(&file, "{}", benchmark::formatted_sections_string(&fin)).expect("unable to write content");
+            }
         }
     }
 }
