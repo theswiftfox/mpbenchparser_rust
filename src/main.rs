@@ -13,7 +13,7 @@ fn main() {
     args.next(); // skip default argument
     let mut folders : Vec<String> = Vec::new();
     let working_dir = env::current_dir().unwrap();
-    let delimiter = ",";
+    let delimiter = ";";
 
     while let Some(arg) = args.next() {
         folders.push(arg);
