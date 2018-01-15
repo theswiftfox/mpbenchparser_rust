@@ -13,6 +13,7 @@ fn main() {
     args.next(); // skip default argument
     let mut folders : Vec<String> = Vec::new();
     let working_dir = env::current_dir().unwrap();
+    let delimiter = ",";
 
     while let Some(arg) = args.next() {
         folders.push(arg);
@@ -52,14 +53,14 @@ fn main() {
         }
 
         let mut first = true;
-        let filename = format!("{}/combined.res", folder_path.display());
+        let filename = format!("{}/combined.csv", folder_path.display());
         let file = File::create(&filename).unwrap();;
         for fin in combined {
             if first {
-                write!(&file, "{}\r\n{}", benchmark::header_string(), benchmark::formatted_sections_string(&fin)).expect("unable to write content to file");
+                write!(&file, "{}\r\n{}", benchmark::header_string(&delimiter), benchmark::formatted_sections_string(&fin, &delimiter)).expect("unable to write content to file");
                 first = false;
             } else {
-                write!(&file, "{}", benchmark::formatted_sections_string(&fin)).expect("unable to write content");
+                write!(&file, "{}", benchmark::formatted_sections_string(&fin, &delimiter)).expect("unable to write content");
             }
         }
     }

@@ -77,19 +77,21 @@ impl fmt::Display for Benchmark {
     }
 }
 
-pub fn header_string(/*benchmark: &Benchmark*/) -> String {
-    return String::from("Name\tThreads\tReps\tTestTime\tDelay\tSamples\tAvg\tMin\tMax\tS.D\tOutliers\tTime\tTimeDeriv\tOverhead\tOverheadDeriv");
+pub fn header_string(/*benchmark: &Benchmark*/delim : &str) -> String {
+    return String::from(format!(
+        "Name{}Threads{}Reps{}TestTime{}Delay{}Samples{}Avg{}Min{}Max{}S.D{}Outliers{}Time{}TimeDeriv{}Overhead{}OverheadDeriv",
+        delim, delim, delim, delim, delim, delim, delim, delim, delim, delim, delim, delim, delim, delim
+    ));
 }
 
-pub fn formatted_sections_string(benchmark: &Benchmark) -> String {
+pub fn formatted_sections_string(benchmark: &Benchmark, delim : &str) -> String {
     let mut formatted = String::new();
     for section in benchmark.sections.clone() {
-        formatted = format!("{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\r\n", 
-            formatted, section.name, benchmark.config.threads, benchmark.config.outer_reps, benchmark.config.test_time,
-            benchmark.config.delay, section.sample_size, section.avg, section.min,
-            section.max, section.sd, section.outliers,
-            section.time, section.time_deriv,
-            section.overhead, section.overhead_deriv);
+        formatted = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}\r\n", 
+            formatted, section.name, delim, benchmark.config.threads, delim, benchmark.config.outer_reps, delim,
+            benchmark.config.test_time, delim,benchmark.config.delay, delim, section.sample_size, delim, section.avg, delim,
+            section.min, delim, section.max, delim, section.sd, delim, section.outliers, delim, section.time, delim,
+            section.time_deriv, delim, section.overhead, delim, section.overhead_deriv);
     }
     return formatted;
 }
